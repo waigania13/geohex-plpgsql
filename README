@@ -1,0 +1,73 @@
+GeoHex for PL/pgSQL
+
+# GeoHex for PL/pgSQL DESCRIPTION
+GeoHex V3 for PL/pgSQL implemented by ASAHI Kosuke
+http://twitter.com/waigania13
+
+GeoHex.sql : ported from
+    JavaScript implementation by @sa2da (http://geohex.net/hex_v3.01_core.js).
+
+#REQUIRED
+ PostgreSQL 9.0 or higher.
+ PostGIS 1.5 or higher.
+ 
+#INSTALL
+ Loading GeoHex.sql and GeoHex-Extra.sql on your spatially-enabled database.
+ 
+#USAGE
+ select geohexGetZoneByLocation(35.0, 140.0, 7); -- (latitude, longitude, level)
+ -> (11197,-4112,XM4848048,7,35.0023513065076,140)
+ #(x,y,geohex code,level,latitude,longitude)
+ 
+ select geohexGetZoneByCode('XM4848048'); -- (code, level)
+ ->(11197,-4112,XM4848048,7,35.0023513065076,140)
+ #(x,y,geohex code,level,latitude,longitude)
+ 
+ select astext(geohexGetHexCoordsByZone(geohexGetZoneByCode('XM4848048'))); -- (zone (,srid=4326))
+ ->POLYGON((139.9939033684 35.0023513065,139.9969516842 35.0066760579,140.0030483158 35.0066760579,140.0060966316 35.0023513065,140.0030483158 34.9980263265,139.9969516842 34.9980263265,139.9939033684 35.0023513065))
+ 
+ select astext(geohexGetHexCoordsByZone(geohexGetZoneByCode('XM4848048'),900913)); -- (zone, srid)
+ ->POLYGON((15584050.037133 4164200.68181666,15584389.3740957 4164788.43068025,15585068.0480209 4164788.43068025,15585407.3849836 4164200.68181666,15585068.0480209 4163612.93295387,15584389.3740957 4163612.93295387,15584050.037133 4164200.68181666))
+ 
+ select * from geohexGetNeighborsByLocation(35.0, 140.0, 7, 1); -- (latitude, longitude, level, distance (,srid=4326))
+ ->code, the_geom
+ 
+ select * from geohexGetNeighborsByLocation(35.0, 140.0, 7, 1, 900913); -- (latitude, longitude, level, distance, srid)
+ ->code, the_geom
+
+ select * from geohexGetNeighborsByCode('XM4848044', 1); -- (code,distance (,srid=4326))
+ ->code, the_geom
+
+ select * from geohexGetNeighborsByCode('XM4848044', 1, 900913); -- (code, distance, srid)
+ ->code, the_geom
+
+ select * from geohexGetIntersectedGeohex(ST_GeomFromText('LINESTRING(140.0 35.0, 140.1 35.1)', 4326), 7); -- (geometry, level)
+ ->code, the_geom
+ 
+#LICENSE
+This library "geohex-plpgsql" is a PL/pgSQL porting of "GeoHex"
+ originally licensed by @sa2da (http://geogames.net)
+ under Creative Commons BY-SA 2.1 Japan License.
+
+geohex-plpgsql is licensed by ASAHI Kosuke
+ under Creative Commons BY-SA 2.1 Japan License.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
